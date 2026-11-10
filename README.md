@@ -1,0 +1,1 @@
+# kostanay-smart-map
