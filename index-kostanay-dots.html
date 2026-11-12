@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>Костанай — умная карта маршрутов</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--ink:#171717;--muted:#686868;--line:#e7e7e7;--soft:#f6f6f6;--blue:#2459d3;--green:#16834a;--red:#c83232}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,Arial,sans-serif;color:var(--ink);background:#fff;overflow:hidden}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr}.top{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;z-index:500}.brand{display:flex;align-items:center;gap:11px}.brand-mark{width:36px;height:36px;border:1.5px solid #222;border-radius:11px;display:grid;place-items:center;font-size:19px}.brand h1{font-size:17px;line-height:1.2;margin:0;font-weight:750}.brand p{font-size:11px;color:var(--muted);margin:4px 0 0}.top-status{font-size:11px;color:var(--muted);white-space:nowrap}.workspace{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:0}.sidebar{padding:13px;overflow:auto;border-right:1px solid var(--line);background:#fff}.card{border:1px solid var(--line);border-radius:13px;padding:12px;margin-bottom:10px;background:#fff}.card h2{font-size:13px;margin:0 0 10px;font-weight:750;display:flex;align-items:center;justify-content:space-between}.sub{font-size:11px;color:var(--muted);line-height:1.45}.btn{border:1px solid #d8d8d8;border-radius:9px;background:#fff;color:#222;padding:9px 11px;font-size:12px;font-weight:650;cursor:pointer;transition:.15s}.btn:hover{background:#f4f4f4}.btn:disabled{opacity:.5;cursor:wait}.btn.primary{background:#171717;color:#fff;border-color:#171717}.btn.primary:hover{background:#333}.btn.active{outline:2px solid #aaa;outline-offset:1px}.btn.danger{color:#b42323;border-color:#e8caca}.btn.full{width:100%}.btnrow{display:flex;gap:7px}.btnrow>*{flex:1}.point-box{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.point{background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:8px;font-size:11px;min-width:0}.point strong{display:block;font-size:12px;margin-bottom:3px}.point span{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.status{margin-top:9px;padding:9px 10px;border-radius:9px;background:#f7f7f7;font-size:11px;line-height:1.5;color:#555}.status.error{background:#fff2f2;color:#a22}.status.good{background:#eff8f2;color:#17683d}.route-info{font-size:12px;line-height:1.6;margin-top:9px}.route-info b{font-size:13px}.field{width:100%;padding:9px;border:1px solid #ddd;border-radius:8px;font-size:12px;margin:5px 0}.check{display:flex;align-items:center;gap:7px;font-size:12px;color:#444}.check input{accent-color:#111}.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:#555}.legend span{display:flex;align-items:center;gap:5px}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid #fff;box-shadow:0 0 0 1px #aaa}.poi-list{max-height:190px;overflow:auto;margin-top:8px}.poi-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px solid #f0f0f0;font-size:11px}.poi-name{min-width:0;line-height:1.35}.poi-name small{display:block;color:#888;margin-top:2px}.mini-actions{display:flex;gap:4px;flex-shrink:0}.mini-actions button{padding:5px 7px;font-size:10px}.map-area{position:relative;min-width:0;min-height:0;background:#fff}#map{height:100%;width:100%;background:#fff}.map-chip{position:absolute;z-index:450;left:12px;bottom:12px;padding:7px 10px;background:#fff;border:1px solid #ddd;border-radius:8px;font-size:10px;color:#666;box-shadow:0 2px 8px #0000000c}.leaflet-container{background:#fff;font-family:Arial,sans-serif}.leaflet-popup-content{font-size:12px;line-height:1.5}.leaflet-control-attribution{font-size:9px!important}.service-dot{width:28px;height:28px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px #0007,0 0 0 1px #0002;display:block}.service-fire{background:#e53935}.service-hospital{background:#1976e9}.service-police{background:#343a40}.closure-bar{width:28px;height:7px;background:#111;border:1px solid #fff;box-shadow:0 1px 4px #0008;transform:rotate(-25deg)}.muted-link{color:#666;text-decoration:underline;cursor:pointer}.hidden{display:none!important}
+@media(max-width:780px){body{overflow:auto}.app{height:100dvh;min-height:620px;grid-template-rows:auto 1fr}.top{padding:10px 12px}.brand h1{font-size:15px}.top-status{display:none}.workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(330px,1fr);min-height:0}.sidebar{border-right:0;border-bottom:1px solid var(--line);max-height:43vh;padding:9px;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}.card{margin:0;padding:10px}.card.route-card{grid-column:1/-1}.card.services-card{grid-column:1/-1}.poi-list{max-height:115px}.map-area{min-height:330px}.map-chip{bottom:8px;left:8px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><div class="brand-mark">⌖</div><div><h1>Костанай — умная карта</h1><p>Уличная сеть · маршруты · экстренные службы</p></div></div><div class="top-status" id="networkStatus">Загрузка карты…</div></header>
+<div class="workspace">
+<aside class="sidebar">
+<section class="card route-card"><h2>Маршрут <span class="sub">A → B</span></h2><div class="btnrow"><button class="btn primary" id="pickA">Выбрать точку A</button><button class="btn" id="pickB">Выбрать точку B</button></div><div class="point-box"><div class="point"><strong>ТОЧКА A</strong><span id="pointA">Не выбрана</span></div><div class="point"><strong>ТОЧКА B</strong><span id="pointB">Не выбрана</span></div></div><div class="btnrow"><button class="btn primary" id="buildRoute">Построить маршрут</button><button class="btn" id="reset">Сбросить</button></div><div id="routeInfo" class="route-info"></div><div id="mainStatus" class="status">Нажмите «Выбрать точку A», затем укажите место на карте или выберите службу ниже.</div></section>
+<section class="card"><h2>Перекрытия дорог</h2><div class="sub">Добавляйте препятствия вручную. Они будут отмечены на карте; маршрутизатор постарается выбрать альтернативный путь.</div><div class="btnrow" style="margin-top:9px"><button class="btn" id="blockMode">＋ Добавить перекрытие</button><button class="btn danger" id="clearBlocks">Удалить все</button></div><div id="blockStatus" class="sub" style="margin-top:7px">Нет добавленных перекрытий.</div></section>
+<section class="card"><h2>Маршрутизация 2ГИС</h2><div id="trafficStatus" class="sub">Проверка подключения…</div><div class="sub" style="margin-top:7px">Ключ хранится на сервере Netlify, а не в открытом HTML. Если 2ГИС недоступен, сайт использует резервный OSRM.</div></section>
+<section class="card services-card"><h2>Экстренные службы <span class="sub" id="serviceCount">Загрузка…</span></h2><div class="legend"><span><i class="dot" style="background:#e53935"></i>Пожарные</span><span><i class="dot" style="background:#1976e9"></i>Больницы</span><span><i class="dot" style="background:#343a40"></i>Полиция</span></div><div class="poi-list" id="poiList"><div class="sub">Загрузка объектов OpenStreetMap…</div></div></section>
+<section class="card"><h2>Как пользоваться</h2><div class="sub">1. Выберите A и B на карте или в списке служб.<br>2. Нажмите «Построить маршрут».<br>3. Для перекрытия включите режим и нажмите на дорогу.<br><br>2ГИС строит быстрый маршрут с учётом пробок; при недоступности 2ГИС используется OSRM.</div></section>
+</aside>
+<main class="map-area"><div id="map"></div><div class="map-chip">Костанай · OpenStreetMap</div></main>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id), center=[53.2144,63.6246];
+if(!window.L){$('networkStatus').textContent='Не загрузилась библиотека карты';$('mainStatus').className='status error';$('mainStatus').textContent='Leaflet не загрузился. Проверьте интернет или откройте сайт позже.';return;}
+const map=L.map('map',{zoomControl:true,preferCanvas:true}).setView(center,13);
+// Основная карта — стандартные тайлы OpenStreetMap.
+ // Если сервер тайлов недоступен, пробуем светлые CARTO.
+ let fallbackTilesAdded=false;
+ const baseTiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+   maxZoom:19,attribution:'© OpenStreetMap contributors'
+ }).addTo(map);
+ baseTiles.on('tileload',()=>{$('networkStatus').textContent='Карта загружена · OpenStreetMap';});
+ baseTiles.on('tileerror',()=>{
+   if(fallbackTilesAdded)return;
+   fallbackTilesAdded=true;
+   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',{
+     subdomains:'abcd',maxZoom:20,attribution:'© OpenStreetMap contributors © CARTO'
+   }).addTo(map);
+ });
+ map.createPane('servicePane'); map.getPane('servicePane').style.zIndex='650';
+const roadLayer=L.layerGroup().addTo(map), serviceLayer=L.layerGroup().addTo(map), closureLayer=L.layerGroup().addTo(map), routeLayer=L.layerGroup().addTo(map), trafficLayer=L.layerGroup();
+// Original prototype style: clean white background with dark OSM road geometry.
+map.getContainer().style.background='#fff';
+let A=null,B=null,mode='A',blockMode=false,blocks=[],servicePoints=[];
+const markerA=L.divIcon({className:'',html:'<div style="width:28px;height:28px;border-radius:50%;background:#16834a;color:white;border:3px solid white;box-shadow:0 1px 5px #0008;display:grid;place-items:center;font-weight:800">A</div>',iconSize:[28,28],iconAnchor:[14,14]});
+const markerB=L.divIcon({className:'',html:'<div style="width:28px;height:28px;border-radius:50%;background:#c83232;color:white;border:3px solid white;box-shadow:0 1px 5px #0008;display:grid;place-items:center;font-weight:800">B</div>',iconSize:[28,28],iconAnchor:[14,14]});
+let markerAObj=null,markerBObj=null;
+function setStatus(text,kind=''){ $('mainStatus').className='status '+kind; $('mainStatus').textContent=text; }
+function setMode(m){mode=m;$('pickA').classList.toggle('primary',m==='A');$('pickB').classList.toggle('primary',m==='B');setStatus('Режим выбора '+m+': нажмите на карту или выберите объект службы.');}
+function updatePoints(){ $('pointA').textContent=A?(A.name||A.lat.toFixed(5)+', '+A.lng.toFixed(5)):'Не выбрана';$('pointB').textContent=B?(B.name||B.lat.toFixed(5)+', '+B.lng.toFixed(5)):'Не выбрана'; }
+function clearRoute(){routeLayer.clearLayers();$('routeInfo').textContent='';}
+function selectPoint(which,latlng,name){const p=L.latLng(latlng.lat,latlng.lng);p.name=name||'';if(which==='A'){A=p;if(markerAObj)map.removeLayer(markerAObj);markerAObj=L.marker(p,{icon:markerA}).bindPopup('Точка A'+(name?'<br>'+escapeHtml(name):'')).addTo(map);setMode('B');}else{B=p;if(markerBObj)map.removeLayer(markerBObj);markerBObj=L.marker(p,{icon:markerB}).bindPopup('Точка B'+(name?'<br>'+escapeHtml(name):'')).addTo(map);setMode('A');}updatePoints();clearRoute();map.panTo(p);}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+$('pickA').onclick=()=>setMode('A');$('pickB').onclick=()=>setMode('B');
+map.on('click',e=>{if(blockMode){addBlock(e.latlng);return;}selectPoint(mode,e.latlng,'');});
+$('reset').onclick=()=>{A=B=null;if(markerAObj)map.removeLayer(markerAObj);if(markerBObj)map.removeLayer(markerBObj);markerAObj=markerBObj=null;clearRoute();updatePoints();setMode('A');setStatus('Точки сброшены. Выберите точку A.');};
+function serviceIcon(type){const css={fire:'service-fire',hospital:'service-hospital',police:'service-police'}[type]||'service-police';return L.divIcon({className:'',html:'<div class="service-dot '+css+'" aria-hidden="true"></div>',iconSize:[30,30],iconAnchor:[15,15]});}
+function addService(el){
+ const lat=Number(el.lat),lon=Number(el.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return;
+ const tags=el.tags||{};
+ const type=(tags.emergency==='fire_station'||tags.amenity==='fire_station'||tags.building==='fire_station')?'fire':(tags.amenity==='hospital'||tags.healthcare==='hospital')?'hospital':'police';
+ const name=tags.name||({fire:'Пожарная часть',hospital:'Больница',police:'Отдел полиции'}[type]);
+ const key=[type,name.toLocaleLowerCase('ru'),lat.toFixed(5),lon.toFixed(5)].join('|');
+ if(servicePoints.some(x=>x.key===key))return;
+ const p={lat,lng:lon,name,type,key};servicePoints.push(p);
+ const marker=L.marker([p.lat,p.lng],{icon:serviceIcon(type),pane:'servicePane',zIndexOffset:1500,riseOnHover:true,keyboard:false}).addTo(serviceLayer);
+ marker.bindPopup('<b>'+escapeHtml(name)+'</b><br>'+({fire:'Пожарная часть',hospital:'Больница',police:'Полиция'}[type])+'<br><button class="btn" data-select="A">Сделать точкой A</button> <button class="btn" data-select="B">Сделать точкой B</button>');
+ marker.on('popupopen',ev=>{ev.popup.getElement().querySelectorAll('[data-select]').forEach(btn=>btn.addEventListener('click',()=>{selectPoint(btn.dataset.select,p,name);map.closePopup();}));});
+}
+function renderServiceList(){const list=$('poiList');if(!servicePoints.length){list.innerHTML='<div class="sub">В этом районе объекты служб не найдены в OSM. Можно выбирать любые точки на карте.</div>';return;}list.innerHTML='';servicePoints.forEach((p,i)=>{const row=document.createElement('div');row.className='poi-row';const n=document.createElement('div');n.className='poi-name';n.textContent=p.name;const small=document.createElement('small');small.textContent=({fire:'Пожарная часть',hospital:'Больница',police:'Полиция'}[p.type]);n.appendChild(small);const actions=document.createElement('div');actions.className='mini-actions';['A','B'].forEach(t=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>{selectPoint(t,p,p.name);};actions.appendChild(b);});row.append(n,actions);list.appendChild(row);});}
+async function loadServices(){
+ const box='(53.14,63.48,53.30,63.78)';
+ const q='[out:json][timeout:25];('
+  +'node["amenity"~"^(hospital|police|fire_station)$"]'+box+';way["amenity"~"^(hospital|police|fire_station)$"]'+box+';relation["amenity"~"^(hospital|police|fire_station)$"]'+box+';'
+  +'node["emergency"="fire_station"]'+box+';way["emergency"="fire_station"]'+box+';relation["emergency"="fire_station"]'+box+';'
+  +'node["building"="fire_station"]'+box+';way["building"="fire_station"]'+box+';relation["building"="fire_station"]'+box+';'
+  +'node["police"="station"]'+box+';way["police"="station"]'+box+';relation["police"="station"]'+box+';'
+  +'node["healthcare"="hospital"]'+box+';way["healthcare"="hospital"]'+box+';relation["healthcare"="hospital"]'+box+';'
+  +');out center tags;';
+ try{
+  const data=await overpass(q);
+  (data.elements||[]).forEach(el=>{if(el.center){el.lat=el.center.lat;el.lon=el.center.lon;}addService(el);});
+  renderServiceList();
+  $('networkStatus').textContent='Объекты служб: '+servicePoints.length;
+  $('serviceCount').textContent=servicePoints.length+' объектов';
+  if(!servicePoints.length)$('poiList').innerHTML='<div class="sub">OSM не вернул объекты служб в выбранном районе. Данные могут быть неполными.</div>';
+ }catch(e){console.warn('POI load failed',e);$('serviceCount').textContent='ошибка загрузки';$('poiList').innerHTML='<div class="sub">Не удалось загрузить список служб из OSM. Попробуйте обновить страницу; точки на карте пока недоступны.</div>';}
+}
+async function overpass(q){const endpoints=['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];let last;for(const endpoint of endpoints){try{const r=await fetch(endpoint+'?data='+encodeURIComponent(q),{signal:AbortSignal.timeout(28000)});if(!r.ok)throw Error('HTTP '+r.status);return await r.json();}catch(e){last=e;}}throw last||Error('Overpass unavailable');}
+async function loadRoads(){const q='[out:json][timeout:25];way["highway"](53.14,63.48,53.30,63.78);out geom;';try{const data=await overpass(q);const features=[];(data.elements||[]).forEach(w=>{if(!w.geometry)return;const coords=w.geometry.map(n=>[n.lat,n.lon]);features.push(L.polyline(coords,{color:'#222',weight:1.35,opacity:.78,interactive:false}));});features.forEach(x=>x.addTo(roadLayer));$('networkStatus').textContent='Уличная сеть загружена';if(!features.length)throw Error('No roads');}catch(e){console.warn('Road geometry unavailable',e);$('networkStatus').textContent='Базовая карта OSM';setStatus('Не удалось загрузить дополнительные чёрные линии дорог. Базовая карта остаётся доступной; маршруты можно строить.','error');}}
+function addBlock(p){const block={lat:p.lat,lng:p.lng,layer:null};const icon=L.divIcon({className:'',html:'<div class="closure-bar"></div>',iconSize:[30,12],iconAnchor:[15,6]});block.layer=L.marker(p,{icon}).addTo(closureLayer).bindPopup('Перекрытие дороги<br><button class="btn" data-remove="1">Удалить</button>');block.layer.on('popupopen',ev=>ev.popup.getElement().querySelector('[data-remove]').addEventListener('click',()=>{blocks=blocks.filter(x=>x!==block);closureLayer.removeLayer(block.layer);updateBlockStatus();}));blocks.push(block);blockMode=false;$('blockMode').classList.remove('active');$('blockMode').textContent='＋ Добавить перекрытие';updateBlockStatus();setStatus('Перекрытие добавлено. При построении маршрута система проверит доступные альтернативы.');}
+function updateBlockStatus(){$('blockStatus').textContent=blocks.length?('Добавлено перекрытий: '+blocks.length+'.'):'Нет добавленных перекрытий.';}
+$('blockMode').onclick=()=>{blockMode=!blockMode;$('blockMode').classList.toggle('active',blockMode);$('blockMode').textContent=blockMode?'Отменить добавление':'＋ Добавить перекрытие';setStatus(blockMode?'Нажмите на закрытую дорогу на карте.':'Режим добавления перекрытия выключен.');};
+$('clearBlocks').onclick=()=>{blocks=[];closureLayer.clearLayers();updateBlockStatus();setStatus('Все ручные перекрытия удалены.');};
+function meters(a,b){const R=6371000,p=Math.PI/180,dl=(b.lat-a.lat)*p,dn=(b.lng-a.lng)*p,x=Math.sin(dl/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
+function hitsBlock(coords,block){return coords.some(c=>meters({lat:c[1],lng:c[0]},block)<45);}
+async function getOsrmRoutes(){const url='https://router.project-osrm.org/route/v1/driving/'+A.lng+','+A.lat+';'+B.lng+','+B.lat+'?overview=full&geometries=geojson&alternatives=3&steps=false';const r=await fetch(url,{signal:AbortSignal.timeout(25000)});if(!r.ok)throw Error('OSRM HTTP '+r.status);const j=await r.json();if(j.code!=='Ok'||!j.routes?.length)throw Error('Маршрут не найден');return j.routes;}
+
+ async function get2GisRoute(){
+   const response=await fetch('/.netlify/functions/route',{
+     method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({a:{lat:A.lat,lng:A.lng},b:{lat:B.lat,lng:B.lng}})
+   });
+   const data=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(data.error||'2ГИС недоступен');
+   if(!Array.isArray(data.coordinates)||data.coordinates.length<2)throw Error('2ГИС вернул пустую геометрию');
+   return data;
+ }
+ $('buildRoute').onclick=async()=>{
+   if(!A||!B){setStatus('Сначала выберите обе точки A и B.','error');return;}
+   if(meters(A,B)<5){setStatus('Точки A и B находятся слишком близко друг к другу.','error');return;}
+   clearRoute();$('buildRoute').disabled=true;$('buildRoute').textContent='Строю…';
+   setStatus('Запрашиваю маршрут…');
+   try{
+     let coords,dist,duration,source='2ГИС · с учётом пробок';
+     if(!blocks.length){
+       try{
+         const g=await get2GisRoute();
+         coords=g.coordinates;dist=g.distance;duration=g.duration;
+       }catch(e){
+         console.warn('2GIS route failed; using OSRM',e);
+         source='OSRM · OpenStreetMap (без данных о пробках)';
+       }
+     }else{
+       source='OSRM · OpenStreetMap (проверка отмеченных препятствий)';
+     }
+     if(!coords){
+       const routes=await getOsrmRoutes();
+       let choices=routes.map(r=>({r,blocked:blocks.some(b=>hitsBlock(r.geometry.coordinates,b))}));
+       let clear=choices.filter(x=>!x.blocked);
+       let chosen=(clear.length?clear:choices).sort((a,b)=>a.r.distance-b.r.distance)[0].r;
+       coords=chosen.geometry.coordinates;dist=chosen.distance;duration=chosen.duration;
+       $('routeInfo').innerHTML='<b>Маршрут по дорожной сети</b><br>Расстояние: '+(dist/1000).toFixed(2)+' км<br>Время в пути: '+Math.round(duration/60)+' мин';
+       if(blocks.length){
+         const allBlocked=!clear.length;
+         $('routeInfo').innerHTML+='<br><span style="color:'+(allBlocked?'#a22':'#17683d')+'">'+(allBlocked?'Внимание: все найденные варианты пересекают отмеченные перекрытия.':'Проверены варианты объезда отмеченных перекрытий.')+'</span>';
+       }
+     }else{
+       $('routeInfo').innerHTML='<b>Маршрут с учётом пробок 2ГИС</b><br>Расстояние: '+(dist/1000).toFixed(2)+' км<br>Время в пути: '+Math.round(duration/60)+' мин';
+     }
+     const line=L.polyline(coords,{color:'#2459d3',weight:6,opacity:.92,lineCap:'round',lineJoin:'round'}).addTo(routeLayer);
+     if(!markerAObj)markerAObj=L.marker(A,{icon:markerA}).addTo(map);
+     if(!markerBObj)markerBObj=L.marker(B,{icon:markerB}).addTo(map);
+     map.fitBounds(line.getBounds(),{padding:[45,45]});
+     $('routeInfo').innerHTML+='<div class="sub">Источник: '+source+'.</div>';
+     setStatus('Маршрут построен. Время и расстояние — расчётные значения сервиса маршрутизации.','good');
+   }catch(e){
+     console.error(e);setStatus('Не удалось построить маршрут. Проверьте интернет и настройки Netlify.','error');
+   }finally{
+     $('buildRoute').disabled=false;$('buildRoute').textContent='Построить маршрут';
+   }
+ };
+$('trafficStatus').textContent='2ГИС подключится после настройки переменной DGIS_API_KEY в Netlify. До этого доступен резервный маршрут OSRM.';
+ // Initialize layers independently: failure of an optional data source never prevents map creation.
+fetch('/.netlify/functions/route',{method:'GET'}).then(r=>r.json()).then(d=>{
+   $('trafficStatus').textContent=d.configured
+     ?'Серверная маршрутизация 2ГИС подключена. Автомаршрут учитывает текущие пробки и закрытые дороги.'
+     :'2ГИС пока не настроен: добавьте DGIS_API_KEY в Netlify. Резервный OSRM работает без ключа.';
+ }).catch(()=>{$('trafficStatus').textContent='Открыт не на Netlify или серверная функция ещё не развёрнута. OSRM доступен как резервный маршрут.';});
+ loadRoads();loadServices();setTimeout(()=>map.invalidateSize(true),250);window.addEventListener('resize',()=>map.invalidateSize());setTimeout(()=>map.invalidateSize(true),1200);
+})();
+</script>
+</body>
+</html>
